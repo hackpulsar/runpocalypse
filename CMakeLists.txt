@@ -27,7 +27,7 @@ set(C_CXX_HEADERS_DIR "inc")
 #
 #   - the place where your pictures, sound files, etc.. live
 #
-set(ASSETS_DIR "assets")
+set(ASSETS_DIR "res")
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 

@@ -1,16 +1,18 @@
 #ifndef PLAYER_HPP
 #define PLAYER_HPP
 
+#include "collidable.hpp"
 #include "entity.hpp"
 #include "animatable.hpp"
 
-class Player : public Entity, Animatable 
+class Player : public Entity, Animatable, public Collidable 
 {
 public:
     Player()
-        : Entity({ OFFSET_TO_LANE * SCALE + (MIDDLE_LINE_WIDTH + 1) * SCALE, 60 })
+        : Entity({ float(OFFSET_TO_LANE * SCALE + (MIDDLE_LINE_WIDTH + 1) * SCALE), 80.f }),
+          Collidable({ { float(OFFSET_TO_LANE * SCALE + (MIDDLE_LINE_WIDTH + 1) * SCALE), 80.f }, { 25.f, 25.f } })
     {
-        m_pSpritesheet = std::make_unique<olc::Sprite>("../res/player_sheet.png");
+        m_pSpritesheet = std::make_unique<olc::Sprite>("./bin/res/player_sheet.png");
         m_pDecal = std::make_unique<olc::Decal>(m_pSpritesheet.get());
 
         Animatable::LoadAnimation(
@@ -47,12 +49,17 @@ public:
 
     void Update(float fElapsedTime) override {
         Animatable::Update(fElapsedTime);
-
-        m_vPosition.y += 100.f * fElapsedTime;
+        Collidable::UpdatePosition(m_vPosition);
     }
 
     void Render(olc::PixelGameEngine& pge) const override {
         Animatable::Render(m_vPosition, pge);
+    }
+
+    void Reset() {
+        m_vPosition = { float(OFFSET_TO_LANE * SCALE + (MIDDLE_LINE_WIDTH + 1) * SCALE), 80.f };
+        Collidable::UpdatePosition(m_vPosition);
+        m_nLane = 1;
     }
 
 private:

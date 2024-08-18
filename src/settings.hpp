@@ -17,4 +17,8 @@ constexpr int OFFSET_TO_LANE = 10;
 constexpr int LANE_WIDTH = 20;
 constexpr int MIDDLE_LINE_WIDTH = 2;
 
+constexpr float ROCKET_SPEED = 150.0f;
+
+constexpr float WARNING_LASTS = 3.0f;
+
 #endif // SETTINGS_HPP

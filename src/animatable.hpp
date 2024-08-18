@@ -9,14 +9,14 @@
 
 struct AnimationData
 {
-    olc::vi2d m_FirstFrame;
-    olc::vi2d m_LastFrame;
-    int m_nFramesCount;
+    olc::vi2d vFirstFrame;
+    olc::vi2d vLastFrame;
+    int nFramesCount;
 
-    olc::vf2d m_RenderSize;
-    olc::vi2d m_ActualSize;
+    olc::vf2d vRenderSize;
+    olc::vi2d vActualSize;
 
-    bool m_bCycle;
+    bool bCycle;
 };
 
 class Animatable
@@ -30,8 +30,8 @@ public:
             m_fAnimationDelay = 0.0f;
 
             m_nFrame++;
-            if (m_nFrame >= m_AnimationsStack.top()->m_nFramesCount) {
-                if (m_AnimationsStack.top()->m_bCycle)
+            if (m_nFrame >= m_AnimationsStack.top()->nFramesCount) {
+                if (m_AnimationsStack.top()->bCycle)
                     m_nFrame = 0;
                 else
                     m_AnimationsStack.pop();
@@ -39,14 +39,14 @@ public:
         }
     }
 
-    void Render(const olc::vi2d& pos, olc::PixelGameEngine& pge) const {
+    void Render(const olc::vf2d& pos, olc::PixelGameEngine& pge) const {
         if (m_AnimationsStack.empty() == false) {
             auto pCurrentAnimation = m_AnimationsStack.top();
 
             pge.DrawPartialDecal(
-                pos, pCurrentAnimation->m_RenderSize, m_pDecal.get(), 
-                olc::vi2d(pCurrentAnimation->m_FirstFrame.x + int(m_nFrame), pCurrentAnimation->m_FirstFrame.y) * pCurrentAnimation->m_ActualSize.x, 
-                pCurrentAnimation->m_ActualSize
+                pos, pCurrentAnimation->vRenderSize, m_pDecal.get(), 
+                olc::vi2d(pCurrentAnimation->vFirstFrame.x + int(m_nFrame), pCurrentAnimation->vFirstFrame.y) * pCurrentAnimation->vActualSize.x, 
+                pCurrentAnimation->vActualSize
             );
         }
     }
