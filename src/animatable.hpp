@@ -31,10 +31,9 @@ public:
 
             m_nFrame++;
             if (m_nFrame >= m_AnimationsStack.top()->nFramesCount) {
-                if (m_AnimationsStack.top()->bCycle)
-                    m_nFrame = 0;
-                else
+                if (m_AnimationsStack.top()->bCycle == false)
                     m_AnimationsStack.pop();
+                m_nFrame = 0;
             }
         }
     }
@@ -45,7 +44,10 @@ public:
 
             pge.DrawPartialDecal(
                 pos, pCurrentAnimation->vRenderSize, m_pDecal.get(), 
-                olc::vi2d(pCurrentAnimation->vFirstFrame.x + int(m_nFrame), pCurrentAnimation->vFirstFrame.y) * pCurrentAnimation->vActualSize.x, 
+                olc::vi2d(
+                    pCurrentAnimation->vFirstFrame.x + int(m_nFrame), 
+                    pCurrentAnimation->vFirstFrame.y
+                ) * pCurrentAnimation->vActualSize, 
                 pCurrentAnimation->vActualSize
             );
         }
@@ -60,6 +62,11 @@ public:
             m_AnimationsStack.push(&m_mAnimations.at(sName));
     }
 
+    const AnimationData* GetCurrentAnimation() const {
+        if (m_AnimationsStack.empty() == false)
+            return m_AnimationsStack.top();
+        return nullptr;}
+
 protected:
     std::unique_ptr<olc::Sprite> m_pSpritesheet;
     std::unique_ptr<olc::Decal> m_pDecal;
@@ -67,8 +74,8 @@ protected:
     std::unordered_map<std::string, AnimationData> m_mAnimations;
     std::stack<AnimationData*> m_AnimationsStack;
     float m_fAnimationDelay = 0.0f;
-    int m_nFrame = 1;
+    int m_nFrame = 0;
     
 };
 
-#endif // ANIMATABLE_HPP
+#endif // ANIMATABLE_HP

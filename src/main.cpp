@@ -1,5 +1,3 @@
-#include "collidable.hpp"
-#include "settings.hpp"
 #define OLC_PGE_APPLICATION
 
 #include "player.hpp"
@@ -44,7 +42,7 @@ public:
                 if (c != nullptr) {
                     if (Collision::AABB(*m_pPlayer, *c)) {
                         pEntity->SelfDestruct();
-                        MakeBoom();
+                        MakeBoom(dynamic_cast<AcidSpit*>(pEntity) != nullptr ? BoomType::Acid : BoomType::Basic);
                         m_bRunning = false;
                     }
                 }
@@ -94,13 +92,13 @@ private:
         }
     }
 
-    void MakeBoom() {
+    void MakeBoom(BoomType type) {
         m_pEntitiesManager->MakeBoom(
             { 
                 m_pPlayer->GetPosition().x + m_pPlayer->GetHitbox().vSize.x / 2 - 32.f, 
                 m_pPlayer->GetPosition().y + m_pPlayer->GetHitbox().vSize.y / 2 - 32.f
             },
-            BoomType::Basic
+            type
         );
     }
 

@@ -16,16 +16,17 @@ public:
     virtual void Update(float fElapsedTime) = 0; 
     virtual void Render(olc::PixelGameEngine& pge) const = 0;
 
-    virtual void AdjustPosition(const int nLane) { };
+    virtual void AdjustPosition(const int nLane) { m_nLane = nLane; };
 
     void SelfDestruct() { m_bSelfDestruct = true; }
 
     bool IsSelfDestruct() const { return m_bSelfDestruct; }
     olc::vf2d GetPosition() const { return m_vPosition; }
-    
+    int GetLane() const { return m_nLane; }
 
 protected:
     olc::vf2d m_vPosition;
+    int m_nLane;
 
     bool m_bSelfDestruct = false;
 

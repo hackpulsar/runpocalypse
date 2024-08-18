@@ -52,6 +52,7 @@ public:
         m_vPosition.y = SCREEN_HEIGHT + 60 * SCALE;
 
         Collidable::UpdatePosition(m_vPosition);
+        Entity::AdjustPosition(nLane);
     }
 
 };

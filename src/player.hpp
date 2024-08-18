@@ -1,9 +1,9 @@
 #ifndef PLAYER_HPP
 #define PLAYER_HPP
 
-#include "collidable.hpp"
 #include "entity.hpp"
 #include "animatable.hpp"
+#include "collidable.hpp"
 
 class Player : public Entity, Animatable, public Collidable 
 {
@@ -14,6 +14,7 @@ public:
     {
         m_pSpritesheet = std::make_unique<olc::Sprite>("./bin/res/player_sheet.png");
         m_pDecal = std::make_unique<olc::Decal>(m_pSpritesheet.get());
+        m_nLane = 1;
 
         Animatable::LoadAnimation(
             {
@@ -63,8 +64,6 @@ public:
     }
 
 private:
-    int m_nLane = 1;
-
     float m_fAnimationDelay = 0.0f;
     bool m_nFrame = 1;
 
