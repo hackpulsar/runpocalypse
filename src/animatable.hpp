@@ -1,9 +1,9 @@
 #ifndef ANIMATABLE_HPP
 #define ANIMATABLE_HPP
 
-#include "olcPixelGameEngine.h"
-
+#include "rendarable.hpp"
 #include "settings.hpp"
+
 #include <stack>
 #include <unordered_map>
 
@@ -19,9 +19,13 @@ struct AnimationData
     bool bCycle;
 };
 
-class Animatable
+class Animatable : public Renderable
 {
 public:
+    Animatable(const std::string& sFilename, RenderData renderData) 
+        : Renderable(sFilename, renderData.viFramePos, renderData.viFrameSize, renderData.vfRenderSize)
+    { }
+
     void Update(float fElapsedTime) {
         if (m_AnimationsStack.empty()) return;
 
@@ -38,7 +42,7 @@ public:
         }
     }
 
-    void Render(const olc::vf2d& pos, olc::PixelGameEngine& pge) const {
+    void Render(const olc::vf2d& pos, olc::PixelGameEngine& pge) const override {
         if (m_AnimationsStack.empty() == false) {
             auto pCurrentAnimation = m_AnimationsStack.top();
 
@@ -68,9 +72,6 @@ public:
         return nullptr;}
 
 protected:
-    std::unique_ptr<olc::Sprite> m_pSpritesheet;
-    std::unique_ptr<olc::Decal> m_pDecal;
-
     std::unordered_map<std::string, AnimationData> m_mAnimations;
     std::stack<AnimationData*> m_AnimationsStack;
     float m_fAnimationDelay = 0.0f;

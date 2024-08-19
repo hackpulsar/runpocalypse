@@ -32,6 +32,7 @@ set(ASSETS_DIR "res")
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/inc")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src")
 
 ##########################################################################
 # DO NOT EDIT BELOW THIS LINE UNLESS YOU KNOW WHAT YOU ARE DOING!!       #

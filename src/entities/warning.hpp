@@ -5,11 +5,12 @@
 #include "animatable.hpp"
 #include "settings.hpp"
 
-class Warning : public Entity, Animatable
+class Warning : public Entity, public Animatable
 {
 public:
     Warning()
-        : Entity({ 0.f, 0.f })
+        : Entity({ 0.f, 0.f }),
+          Animatable("./bin/res/warning_sheet.png", { { 0, 0 }, { 16, 64 }, { 8.f, 32.f } })
     {
         m_pSpritesheet = std::make_unique<olc::Sprite>("./bin/res/warning_sheet.png");
         m_pDecal = std::make_unique<olc::Decal>(m_pSpritesheet.get());
@@ -19,8 +20,8 @@ public:
                 { 0, 0 },
                 { 1, 0 },
                 2,
-                { 8.f, 32.f },
-                { 16, 64 },
+                m_RenderData.vfRenderSize,
+                m_RenderData.viFrameSize,
                 true
             },
             "flash"
@@ -47,6 +48,8 @@ public:
         else
             m_vPosition.x = (OFFSET_TO_LANE + (nLane - 1) * LANE_WIDTH + (LANE_WIDTH / 2 - 2)) * SCALE;
         m_vPosition.y = SCREEN_HEIGHT - 32 * SCALE;
+
+        Entity::AdjustPosition(nLane);
     }
 
 private:

@@ -10,18 +10,16 @@ class AcidSpit : public Entity, public Animatable, public Collidable
 public:
     AcidSpit()
         : Entity({ 0.f, 0.f }),
+          Animatable("./bin/res/acid_spit_sheet.png", { { 0, 0 }, { 8, 8 }, { 8.f, 8.f } }),
           Collidable({ { 0.f, 0.f }, { 8.f, 8.f } })
     {
-        m_pSpritesheet = std::make_unique<olc::Sprite>("./bin/res/acid_spit_sheet.png");
-        m_pDecal = std::make_unique<olc::Decal>(m_pSpritesheet.get());
-
         Animatable::LoadAnimation(
             {
                 { 0, 0 },
                 { 2, 0 },
                 3,
-                { 8.f, 8.f },
-                { 8, 8 },
+                m_RenderData.vfRenderSize,
+                m_RenderData.viFrameSize,
                 true
             },
             "idle"
@@ -33,11 +31,11 @@ public:
     void Update(float fElapsedTime) override {
         m_vPosition.y -= ACID_SPIT_SPEED * fElapsedTime;
 
-        if (m_vPosition.y > SCREEN_HEIGHT)
+        if (m_vPosition.y < -8.0f * SCALE)
             m_bSelfDestruct = true;
 
         Animatable::Update(fElapsedTime);
-        Collidable::UpdatePosition(m_vPosition);
+        Collidable::UpdatePosition(m_vPosition + olc::vf2d(0.f, 16.f));
     }
 
     void Render(olc::PixelGameEngine& pge) const override {
@@ -52,7 +50,7 @@ public:
 
         m_vPosition.y = SCREEN_HEIGHT - 8 * SCALE;
 
-        Collidable::UpdatePosition(m_vPosition);
+        Entity::AdjustPosition(nLane);
     }
 
 };

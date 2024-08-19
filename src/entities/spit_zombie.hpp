@@ -4,22 +4,20 @@
 #include "entity.hpp"
 #include "animatable.hpp"
 
-class SpitZombie : public Entity, Animatable
+class SpitZombie : public Entity, public Animatable
 {
 public:
     SpitZombie()
-        : Entity({ 0.0f, 0.0f })
+        : Entity({ 0.0f, 0.0f }),
+          Animatable("./bin/res/zombie_sheet.png", { { 0, 0 }, { 16, 32 }, { 25.f, 50.f } })
     {
-        m_pSpritesheet = std::make_unique<olc::Sprite>("./bin/res/zombie_sheet.png");
-        m_pDecal = std::make_unique<olc::Decal>(m_pSpritesheet.get());
-
         Animatable::LoadAnimation(
             {
                 { 0, 0 },
                 { 1, 0 },
                 2,
-                { 25.f, 50.f },
-                { 16, 32 },
+                m_RenderData.vfRenderSize,
+                m_RenderData.viFrameSize,
                 true
             },
             "idle"
@@ -30,8 +28,8 @@ public:
                 { 0, 1 },
                 { 7, 1 },
                 8,
-                { 25.f, 50.f },
-                { 16, 32 },
+                m_RenderData.vfRenderSize,
+                m_RenderData.viFrameSize,
                 false
             },
             "spit"

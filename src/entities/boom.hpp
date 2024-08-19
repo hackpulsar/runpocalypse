@@ -10,18 +10,16 @@ class Boom : public Entity, Animatable
 {
 public:
     Boom(const olc::vf2d& vPosition, BoomType type = BoomType::Basic)
-        : Entity(vPosition)
+        : Entity(vPosition),
+          Animatable("./bin/res/booms_sheet.png", { { 0, 0 }, { 32, 32 }, { 64.f, 64.f } })
     {
-        m_pSpritesheet = std::make_unique<olc::Sprite>("./bin/res/booms_sheet.png");
-        m_pDecal = std::make_unique<olc::Decal>(m_pSpritesheet.get());
-
         Animatable::LoadAnimation(
             {
                 { 0, int(type) },
                 { 1, int(type) },
                 2,
-                { 64.f, 64.f },
-                { 32, 32 },
+                m_RenderData.vfRenderSize,
+                m_RenderData.viFrameSize,
                 true
             },
             "boom"

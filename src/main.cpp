@@ -1,7 +1,7 @@
 #define OLC_PGE_APPLICATION
 
-#include "player.hpp"
-#include "entities_manager.hpp"
+#include "entities/player.hpp"
+#include "entities/entities_manager.hpp"
 #include "collision.hpp"
 
 class Application : public olc::PixelGameEngine

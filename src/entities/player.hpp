@@ -10,10 +10,9 @@ class Player : public Entity, Animatable, public Collidable
 public:
     Player()
         : Entity({ float(OFFSET_TO_LANE * SCALE + (MIDDLE_LINE_WIDTH + 1) * SCALE), 80.f }),
-          Collidable({ { float(OFFSET_TO_LANE * SCALE + (MIDDLE_LINE_WIDTH + 1) * SCALE), 80.f }, { 25.f, 25.f } })
+          Animatable("./bin/res/player_sheet.png", { { 0, 0 }, { 16, 32 }, { 25.f, 50.f } }),
+          Collidable({ { float(OFFSET_TO_LANE * SCALE + (MIDDLE_LINE_WIDTH + 1) * SCALE), 80.f }, { 25.f, 2.f } })
     {
-        m_pSpritesheet = std::make_unique<olc::Sprite>("./bin/res/player_sheet.png");
-        m_pDecal = std::make_unique<olc::Decal>(m_pSpritesheet.get());
         m_nLane = 1;
 
         Animatable::LoadAnimation(
@@ -21,8 +20,8 @@ public:
                 { 1, 0 },
                 { 2, 0 },
                 2,
-                { 25.f, 50.f },
-                { 16, 32 },
+                m_RenderData.vfRenderSize,
+                m_RenderData.viFrameSize,
                 true
             }, 
             "run"
@@ -50,7 +49,7 @@ public:
 
     void Update(float fElapsedTime) override {
         Animatable::Update(fElapsedTime);
-        Collidable::UpdatePosition(m_vPosition);
+        Collidable::UpdatePosition(m_vPosition + olc::vf2d(0.f, 48.f));
     }
 
     void Render(olc::PixelGameEngine& pge) const override {
