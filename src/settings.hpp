@@ -22,4 +22,6 @@ constexpr float ACID_SPIT_SPEED = 120.0f;
 
 constexpr float WARNING_LASTS = 3.0f;
 
+constexpr float PLAYER_SPEED = 4.5f;
+
 #endif // SETTINGS_HPP

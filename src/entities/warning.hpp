@@ -47,7 +47,7 @@ public:
             m_vPosition.x = (OFFSET_TO_LANE + (nLane - 1) * LANE_WIDTH + MIDDLE_LINE_WIDTH + (LANE_WIDTH / 2 - 4)) * SCALE;
         else
             m_vPosition.x = (OFFSET_TO_LANE + (nLane - 1) * LANE_WIDTH + (LANE_WIDTH / 2 - 2)) * SCALE;
-        m_vPosition.y = SCREEN_HEIGHT - 32 * SCALE;
+        m_vPosition.y = SCREEN_HEIGHT - 24 * SCALE;
 
         Entity::AdjustPosition(nLane);
     }

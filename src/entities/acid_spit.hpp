@@ -26,6 +26,8 @@ public:
         );
 
         Animatable::AddAnimation("idle");
+
+        Renderable::SetLayer(2);
     }
 
     void Update(float fElapsedTime) override {

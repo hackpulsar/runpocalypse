@@ -13,9 +13,9 @@ class Obstacle : public Entity, public Renderable, public Collidable
 public:
     Obstacle(olc::vf2d vfSpriteSize)
         : Entity({ 0.0f, 0.0f }), 
-          Renderable("./bin/res/obstacles_sheet.png", { 0, 0 }, vfSpriteSize, vfSpriteSize),
+          Renderable("./bin/res/obstacles_sheet.png", { 0, 0 }, vfSpriteSize, vfSpriteSize, 0),
           Collidable({ { 0.0f, 0.0f }, m_RenderData.vfRenderSize * SCALE })
-    {  }
+    { }
 
     virtual void Update(float fElapsedTime) override {
         m_vPosition.y += BACKGROUND_SPEED * fElapsedTime;

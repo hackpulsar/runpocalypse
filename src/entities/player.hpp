@@ -4,14 +4,18 @@
 #include "entity.hpp"
 #include "animatable.hpp"
 #include "collidable.hpp"
+#include "rendarable.hpp"
 
-class Player : public Entity, Animatable, public Collidable 
+#include "log.hpp"
+
+class Player : public Entity, public Animatable, public Collidable 
 {
 public:
-    Player()
+    Player(bool* pGameRunning)
         : Entity({ float(OFFSET_TO_LANE * SCALE + (MIDDLE_LINE_WIDTH + 1) * SCALE), 80.f }),
           Animatable("./bin/res/player_sheet.png", { { 0, 0 }, { 16, 32 }, { 25.f, 50.f } }),
-          Collidable({ { float(OFFSET_TO_LANE * SCALE + (MIDDLE_LINE_WIDTH + 1) * SCALE), 80.f }, { 25.f, 2.f } })
+          Collidable({ { float(OFFSET_TO_LANE * SCALE + (MIDDLE_LINE_WIDTH + 1) * SCALE), 80.f }, { 25.f, 2.f } }),
+          m_pGameRunning(pGameRunning)
     {
         m_nLane = 1;
 
@@ -28,6 +32,8 @@ public:
         );
 
         Animatable::AddAnimation("run");
+
+        Renderable::SetLayer(1);
     }
 
     void HandleInput(olc::PixelGameEngine& pge) override {
@@ -53,18 +59,22 @@ public:
     }
 
     void Render(olc::PixelGameEngine& pge) const override {
-        Animatable::Render(m_vPosition, pge);
+        if (*m_pGameRunning) Animatable::Render(m_vPosition, pge);
     }
 
     void Reset() {
         m_vPosition = { float(OFFSET_TO_LANE * SCALE + (MIDDLE_LINE_WIDTH + 1) * SCALE), 80.f };
         Collidable::UpdatePosition(m_vPosition);
         m_nLane = 1;
+
+        LOG("Player reset");
     }
 
 private:
     float m_fAnimationDelay = 0.0f;
     bool m_nFrame = 1;
+
+    bool* m_pGameRunning;
 
 };
 

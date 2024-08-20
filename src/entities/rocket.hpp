@@ -26,6 +26,8 @@ public:
         );
 
         Animatable::AddAnimation("fly");
+
+        Renderable::SetLayer(2);
     }
 
     void Update(float fElapsedTime) override {

@@ -1,6 +1,7 @@
 #ifndef ENTITIES_MANAGER_HPP
 #define ENTITIES_MANAGER_HPP
 
+#include "player.hpp"
 #include "spit_zombie.hpp"
 #include "warning.hpp"
 #include "rocket.hpp"
@@ -17,32 +18,45 @@
 
 #include "log.hpp"
 #include "randomize.hpp"
+#include <algorithm>
+#include <memory>
 
 typedef std::pair<float, int> SpawnData;
+typedef std::vector<std::unique_ptr<Entity>> EntitiesVector;
 
 class EntitiesManager
 {
 public:
-    EntitiesManager() = default;
-
-    ~EntitiesManager() {
-        for (auto& pEntity : m_vEntities)
-            delete pEntity;
+    EntitiesManager(std::shared_ptr<Player> pPlayer, bool* pGameRunning) 
+        : m_pPlayer(pPlayer), m_pGameRunning(pGameRunning)
+    {
+        m_vLayers.resize(4);
+        m_vLayers[m_pPlayer->GetLayer()].push_back(m_pPlayer.get());
     }
 
-    void AddEntity(Entity* pEntity, int nLane = 1) {
+    ~EntitiesManager() { }
+
+    void AddEntity(std::unique_ptr<Entity> pEntity, int nLane = 1) {
         pEntity->AdjustPosition(nLane);
-        m_vEntities.push_back(pEntity);
-        LOG("Entity added to the game, " << pEntity->GetLane());
+
+        Renderable* r = dynamic_cast<Renderable*>(pEntity.get());
+        if (r != nullptr) {
+            m_vLayers[r->GetLayer()].push_back(pEntity.get());
+            LOG("Entity added to the layer");
+        }
+
+        m_vEntities.push_back(std::move(pEntity));
+
+        LOG("Entity added to the game");
     }
 
     void MakeBoom(const olc::vf2d& vPosition, BoomType type = BoomType::Basic) {
-        this->AddEntity(new Boom(vPosition, type));
+        this->AddEntity(std::make_unique<Boom>(vPosition, type));
     }
 
     void Update(float fElapsedTime, const int nDifficultyLevel) {
         // Basic spawner timer
-        m_fEnemiesSpawnTimer += fElapsedTime;
+        if (*m_pGameRunning) m_fEnemiesSpawnTimer += fElapsedTime;
         if (m_fEnemiesSpawnTimer >= m_fSpawnInterval) {
             m_fEnemiesSpawnTimer = 0.0f;
             //m_fSpawnInterval = 5.0f - nDifficultyLevel * 0.5f;
@@ -55,44 +69,55 @@ public:
             } while (m_bLanes.test(nLane - 1));
             m_bLanes.set(nLane - 1);
 
-            AddEntity(new Warning(), nLane);
+            AddEntity(std::make_unique<Warning>(), nLane);
             m_vSpawnQueue.push_back({WARNING_LASTS, nLane});
         }
 
-        m_fObstaclesSpawnTimer += fElapsedTime;
+        if (*m_pGameRunning) m_fObstaclesSpawnTimer += fElapsedTime;
         if (m_fObstaclesSpawnTimer >= m_fSpawnInterval) {
             m_fObstaclesSpawnTimer = 0.0f;
             int nLane = Randomize::GetRandom(1, 4);
             LOG("Lane for an obstacle: " + std::to_string(nLane));
             int nObstacleType = Randomize::GetRandom(0, 8);
             if (nObstacleType == 0)
-                AddEntity(new AcidPuddle(), nLane);
+                AddEntity(std::make_unique<AcidPuddle>(), nLane);
             else if (nObstacleType == 1)
-                AddEntity(new AcidBarrel(), nLane);
+                AddEntity(std::make_unique<AcidBarrel>(), nLane);
             else if (nObstacleType == 2)
-                AddEntity(new Rock(), nLane);
+                AddEntity(std::make_unique<Rock>(), nLane);
             else if (nObstacleType == 3)
-                AddEntity(new Tree(), nLane);
+                AddEntity(std::make_unique<Tree>(), nLane);
             else if (nObstacleType == 4)
-                AddEntity(new Bush(), nLane);
+                AddEntity(std::make_unique<Bush>(), nLane);
             else if (nObstacleType == 5)
-                AddEntity(new SmallTree(), nLane);
+                AddEntity(std::make_unique<SmallTree>(), nLane);
             else if (nObstacleType >= 6)
-                AddEntity(new Car(), nLane);
+                AddEntity(std::make_unique<Car>(), nLane);
             else
                 LOG("Unknown obstacle type");
             LOG("Obstacle added to the game: " + std::to_string(nLane));
+        }
+
+        // Removing all entities from the layers that are marked to self-destruct
+        for (auto& layer : m_vLayers) {
+            layer.erase(
+                std::remove_if(
+                    layer.begin(), layer.end(),
+                    [](Entity* pEntity) { return pEntity->IsSelfDestruct(); }
+                ),
+                layer.end()
+            );
         }
         
         // Removing all entities that are marked to self-destruct
         m_vEntities.erase(
             std::remove_if(
                 m_vEntities.begin(), m_vEntities.end(),
-                [](Entity* pEntity) { return pEntity->IsSelfDestruct(); }
+                [](std::unique_ptr<Entity>& pEntity) { return pEntity->IsSelfDestruct(); }
             ),
             m_vEntities.end()
         );
-        
+
         // Spawning entities from the queue
         for (auto& data : m_vSpawnQueue) {
             float& fTime = data.first;
@@ -101,9 +126,9 @@ public:
                 int nEnemyType = Randomize::GetRandom(0, 1);
 
                 if (nEnemyType == 0)
-                    AddEntity(new Rocket(), data.second);
+                    AddEntity(std::make_unique<Rocket>(), data.second);
                 else if (nEnemyType == 1)
-                    AddEntity(new SpitZombie(), data.second);
+                    AddEntity(std::make_unique<SpitZombie>(), data.second);
                 else
                     LOG("Unknown enemy type");
             }
@@ -119,48 +144,62 @@ public:
         );
 
         for (auto& pEntity : m_vEntities) {
-            SpitZombie* sz = dynamic_cast<SpitZombie*>(pEntity);
+            SpitZombie* sz = dynamic_cast<SpitZombie*>(pEntity.get());
             if (sz != nullptr && sz->ReadyToSpit()) {
                 sz->Spit();
-                this->AddEntity(new AcidSpit(), sz->GetLane());
+                this->AddEntity(std::make_unique<AcidSpit>(), sz->GetLane());
                 break; // ones per one cycle to avoid messing up the container while iterating
             }
         }
         
         // Update
+        m_pPlayer->Update(fElapsedTime);
+
         m_bLanes.reset();
         for (auto& pEntity : m_vEntities) {
             pEntity->Update(fElapsedTime);
 
-            Obstacle* o = dynamic_cast<Obstacle*>(pEntity);
+            Obstacle* o = dynamic_cast<Obstacle*>(pEntity.get());
             if (o == nullptr) m_bLanes.set(pEntity->GetLane() - 1);
         }
     }
 
     void Render(olc::PixelGameEngine& pge) const {
-        for (auto& pEntity : m_vEntities)
-            pEntity->Render(pge);
+        // layers.
+        for (const auto& layer : m_vLayers) {
+            for (const auto& pEntity : layer) {
+                Renderable* r = dynamic_cast<Renderable*>(pEntity);
+                if (r != nullptr)
+                    pEntity->Render(pge);
+            }
+        }
     }
 
-    const std::vector<Entity*>& GetEntities() const { return m_vEntities; }
+    const EntitiesVector& GetEntities() const { return m_vEntities; }
 
     void Reset() {
-        for (auto& pEntity : m_vEntities)
-            delete pEntity;
         m_vEntities.clear();
+
+        for (auto& layer : m_vLayers)
+            layer.clear();
+        m_vLayers.clear();
+        m_vLayers.resize(4);
+
+        m_vLayers[m_pPlayer->GetLayer()].push_back(m_pPlayer.get());
 
         m_vSpawnQueue.clear();
 
         m_fEnemiesSpawnTimer = 0.0f;
         m_fSpawnInterval = 10.0f;
+
+        LOG("Entities manager reset");
     }
 
 private:
-    std::vector<Entity*> m_vEntities;
-    
-    // Type specified entities container
-    std::vector<Entity*> m_vEnemies;
-    std::vector<Entity*> m_vObstacles;
+    EntitiesVector m_vEntities;
+    std::shared_ptr<Player> m_pPlayer;
+
+    std::vector<std::vector<Entity*>> m_vLayers;
 
     std::vector<SpawnData> m_vSpawnQueue;
     std::bitset<4> m_bLanes;
@@ -168,6 +207,8 @@ private:
     float m_fEnemiesSpawnTimer = 0.0f;
     float m_fObstaclesSpawnTimer = 0.0f;
     float m_fSpawnInterval = 10.0f;
+
+    bool* m_pGameRunning;
 
 };
 

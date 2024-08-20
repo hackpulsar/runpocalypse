@@ -3,10 +3,11 @@
 
 #include "entity.hpp"
 #include "animatable.hpp"
+#include "rendarable.hpp"
 
-enum class BoomType { Basic = 0, Acid };
+enum class BoomType { Basic = 0, Acid, Dust };
 
-class Boom : public Entity, Animatable
+class Boom : public Entity, public Animatable
 {
 public:
     Boom(const olc::vf2d& vPosition, BoomType type = BoomType::Basic)
@@ -26,6 +27,7 @@ public:
         );
 
         Animatable::AddAnimation("boom");
+        Renderable::SetLayer(3);
     }
 
     void Update(float fElapsedTime) override {
