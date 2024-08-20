@@ -10,7 +10,7 @@ class AcidSpit : public Entity, public Animatable, public Collidable
 public:
     AcidSpit()
         : Entity({ 0.f, 0.f }),
-          Animatable("./bin/res/acid_spit_sheet.png", { { 0, 0 }, { 8, 8 }, { 8.f, 8.f } }),
+          Animatable("./bin/res/projectiles.png", { { 0, 0 }, { 8, 8 }, { 8.f, 8.f } }),
           Collidable({ { 0.f, 0.f }, { 8.f, 8.f } })
     {
         Animatable::LoadAnimation(

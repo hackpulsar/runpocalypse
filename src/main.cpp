@@ -1,5 +1,3 @@
-#include "settings.hpp"
-#include <memory>
 #define OLC_PGE_APPLICATION
 
 #include "entities/player.hpp"
@@ -64,7 +62,7 @@ public:
         }
         else {
             if (!m_bFlashPhaseOneEnded) {
-                m_fFlashTransperency += 1500.0f * fElapsedTime;
+                m_fFlashTransperency += 2000.0f * fElapsedTime;
                 if (m_fFlashTransperency >= 255) {
                     m_fFlashTransperency = 255;
                     m_bFlashPhaseOneEnded = true;

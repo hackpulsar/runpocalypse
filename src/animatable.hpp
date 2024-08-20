@@ -66,6 +66,11 @@ public:
             m_AnimationsStack.push(&m_mAnimations.at(sName));
     }
 
+    void PopAnimation() {
+        if (!m_AnimationsStack.empty())
+            m_AnimationsStack.pop();
+    }
+
     const AnimationData* GetCurrentAnimation() const {
         if (m_AnimationsStack.empty() == false)
             return m_AnimationsStack.top();

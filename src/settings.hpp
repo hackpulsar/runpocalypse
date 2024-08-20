@@ -19,6 +19,7 @@ constexpr int MIDDLE_LINE_WIDTH = 2;
 
 constexpr float ROCKET_SPEED = 150.0f;
 constexpr float ACID_SPIT_SPEED = 120.0f;
+constexpr float BARREL_ROTATION_SPEED = 10.0f;
 
 constexpr float WARNING_LASTS = 3.0f;
 

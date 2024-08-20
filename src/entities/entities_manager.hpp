@@ -3,10 +3,12 @@
 
 #include "player.hpp"
 #include "spit_zombie.hpp"
+#include "barrel_zombie.hpp"
 #include "warning.hpp"
 #include "rocket.hpp"
 #include "boom.hpp"
 #include "acid_spit.hpp"
+#include "barrel.hpp"
 
 #include "obstacles/acid_puddle.hpp"
 #include "obstacles/acid_barrel.hpp"
@@ -123,12 +125,14 @@ public:
             float& fTime = data.first;
             fTime -= fElapsedTime;
             if (fTime <= 0.0f) {
-                int nEnemyType = Randomize::GetRandom(0, 1);
+                int nEnemyType = Randomize::GetRandom(0, 2);
 
                 if (nEnemyType == 0)
-                    AddEntity(std::make_unique<Rocket>(), data.second);
+                    AddEntity(std::make_unique<Rocket>(), data.second); 
                 else if (nEnemyType == 1)
                     AddEntity(std::make_unique<SpitZombie>(), data.second);
+                else if (nEnemyType == 2)
+                    AddEntity(std::make_unique<BarrelZombie>(), data.second);
                 else
                     LOG("Unknown enemy type");
             }
@@ -144,11 +148,19 @@ public:
         );
 
         for (auto& pEntity : m_vEntities) {
-            SpitZombie* sz = dynamic_cast<SpitZombie*>(pEntity.get());
-            if (sz != nullptr && sz->ReadyToSpit()) {
-                sz->Spit();
-                this->AddEntity(std::make_unique<AcidSpit>(), sz->GetLane());
-                break; // ones per one cycle to avoid messing up the container while iterating
+            Zombie* sz = dynamic_cast<Zombie*>(pEntity.get());
+            if (sz != nullptr) {
+                if (*m_pGameRunning == false) sz->ToggleEndGameAnimation();
+
+                if (sz->ReadyToShoot()) {
+                    sz->Shoot();
+
+                    if (dynamic_cast<BarrelZombie*>(pEntity.get()) != nullptr)
+                        this->AddEntity(std::make_unique<Barrel>(), sz->GetLane());
+                    else
+                        this->AddEntity(std::make_unique<AcidSpit>(), sz->GetLane());
+                    break; // ones per one cycle to avoid messing up the container while iterating
+                }
             }
         }
         

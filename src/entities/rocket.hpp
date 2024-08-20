@@ -5,7 +5,7 @@
 #include "animatable.hpp"
 #include "collidable.hpp"
 
-class Rocket : public Entity, Animatable, public Collidable
+class Rocket : public Entity, public Animatable, public Collidable
 {
 public:
     Rocket(olc::vi2d vPosition = { 0, 0 }) 
@@ -52,7 +52,6 @@ public:
 
         m_vPosition.y = SCREEN_HEIGHT + 60 * SCALE;
 
-        Collidable::UpdatePosition(m_vPosition);
         Entity::AdjustPosition(nLane);
     }
 
