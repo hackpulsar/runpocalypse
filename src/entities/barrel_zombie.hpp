@@ -44,6 +44,12 @@ public:
         m_bShot = true;
     }
 
+    void ToggleEndGameAnimation() override {
+        Zombie::ToggleEndGameAnimation();
+        Animatable::PopAnimation();
+        Animatable::AddAnimation("idle");
+    }
+
 private:
     bool m_bShot = false;
     const float m_fThrowDelay = 5.0f;

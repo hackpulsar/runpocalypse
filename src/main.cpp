@@ -87,6 +87,12 @@ public:
 
             m_fScore += fElapsedTime * PLAYER_SPEED;
 
+            if ((int)m_fScore % 50 == 0) {
+                LOG("Difficulty level increased, score: " + std::to_string((int)m_fScore));
+                m_nDifficultyLevel++;
+                m_fScore += 1.0f;
+            }
+
             m_pPlayer->HandleInput(*this);
         }
         else {
@@ -201,7 +207,7 @@ private:
     std::unique_ptr<EntitiesManager> m_pEntitiesManager;
 
     int m_nDifficultyLevel = 1;
-    float m_fScore = 0.0f; 
+    float m_fScore = 1.0f; 
 
     bool m_bRunning = true;
 

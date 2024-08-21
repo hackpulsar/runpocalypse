@@ -61,24 +61,29 @@ public:
     void Update(float fElapsedTime, const int nDifficultyLevel) {
         // Basic spawner timer
         if (*m_pGameRunning) m_fEnemiesSpawnTimer += fElapsedTime;
-        if (m_fEnemiesSpawnTimer >= m_fSpawnInterval) {
+        if (m_fEnemiesSpawnTimer >= m_fEnemiesSpawnInterval) {
             m_fEnemiesSpawnTimer = 0.0f;
-            //m_fSpawnInterval = 5.0f - nDifficultyLevel * 0.5f;
+            
+            m_fEnemiesSpawnInterval = 10.f - float(nDifficultyLevel);
             
             // Show a warning first and add an enemy to the queue
-            int nLane;
+            int nLane, nTries = 0;
             do {
                 nLane = Randomize::GetRandom(1, 4);
-                LOG("Lane for enemy: " + std::to_string(nLane));
-            } while (m_bLanes.test(nLane - 1));
-            m_bLanes.set(nLane - 1);
+                nTries++;
+                //LOG("Lane for enemy: " + std::to_string(nLane));
+            } while (m_bLanes.test(nLane - 1) && nTries < 4);
 
-            AddEntity(std::make_unique<Warning>(), nLane);
-            m_vSpawnQueue.push_back({WARNING_LASTS, nLane});
+            if (nTries < 4) {
+                m_bLanes.set(nLane - 1);
+
+                AddEntity(std::make_unique<Warning>(), nLane);
+                m_vSpawnQueue.push_back({WARNING_LASTS, nLane});
+            }
         }
 
         if (*m_pGameRunning) m_fObstaclesSpawnTimer += fElapsedTime;
-        if (m_fObstaclesSpawnTimer >= m_fSpawnInterval) {
+        if (m_fObstaclesSpawnTimer >= m_fObstaclesSpawnInterval) {
             m_fObstaclesSpawnTimer = 0.0f;
             int nLane = Randomize::GetRandom(1, 4);
             LOG("Lane for an obstacle: " + std::to_string(nLane));
@@ -212,7 +217,7 @@ public:
         m_vSpawnQueue.clear();
 
         m_fEnemiesSpawnTimer = 0.0f;
-        m_fSpawnInterval = 10.0f;
+        m_fEnemiesSpawnInterval = 10.0f;
 
         LOG("Entities manager reset");
     }
@@ -228,7 +233,9 @@ private:
 
     float m_fEnemiesSpawnTimer = 0.0f;
     float m_fObstaclesSpawnTimer = 0.0f;
-    float m_fSpawnInterval = 10.0f;
+
+    float m_fEnemiesSpawnInterval = 10.0f;
+    float m_fObstaclesSpawnInterval = 8.0f;
 
     bool* m_pGameRunning;
 

@@ -84,7 +84,7 @@ public:
         Entity::AdjustPosition(nLane);
     }
 
-    void ToggleEndGameAnimation() { m_bEndGame = true; }
+    virtual void ToggleEndGameAnimation() { m_bEndGame = true; }
     void ToggleColided() { m_bColided = true; }
 
     bool ReadyToShoot() const { return m_bReadyToShoot; }
