@@ -39,9 +39,9 @@ public:
 
     void AdjustPosition(const int nLane) override {
         if (nLane > 2)
-            m_vPosition.x = (OFFSET_TO_LANE + (nLane - 1) * LANE_WIDTH + MIDDLE_LINE_WIDTH + (LANE_WIDTH / 2 - 2)) * SCALE;
+            m_vPosition.x = (OFFSET_TO_LANE + (nLane - 1) * LANE_WIDTH + MIDDLE_LINE_WIDTH + (LANE_WIDTH / 2 - 1)) * SCALE;
         else
-            m_vPosition.x = (OFFSET_TO_LANE + (nLane - 1) * LANE_WIDTH + (LANE_WIDTH / 2 - 2)) * SCALE;
+            m_vPosition.x = (OFFSET_TO_LANE + (nLane - 1) * LANE_WIDTH + (LANE_WIDTH / 2 - 1)) * SCALE;
 
         m_vPosition.y = SCREEN_HEIGHT - 8 * SCALE;
 

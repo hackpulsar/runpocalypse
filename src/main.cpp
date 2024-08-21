@@ -2,7 +2,10 @@
 
 #include "entities/player.hpp"
 #include "entities/entities_manager.hpp"
+#include "menu.hpp"
 #include "collision.hpp"
+
+#include <fstream>
 
 class Application : public olc::PixelGameEngine
 {
@@ -11,9 +14,7 @@ public:
 		sAppName = "RUNPOCALYPSE by @hackpulsar";
 	}
 
-    ~Application() {
-        delete m_pEntitiesManager;
-    }
+    ~Application() = default;
 
 public:
 	bool OnUserCreate() override
@@ -25,17 +26,25 @@ public:
         m_pFlashDecal = std::make_unique<olc::Decal>(m_pFlashSprite.get());
 
         m_pPlayer = std::make_shared<Player>(&m_bRunning);
-        m_pEntitiesManager = new EntitiesManager(m_pPlayer, &m_bRunning);
+        m_pEntitiesManager = std::make_unique<EntitiesManager>(m_pPlayer, &m_bRunning);
+
+        m_pMenu = std::make_unique<Menu>();
 
 		return true;
 	}
 
 	bool OnUserUpdate(float fElapsedTime) override
 	{
+        if (!m_pMenu->IsReadyToStart()) {
+            m_pMenu->Update(this);
+            m_pMenu->Render(this);
+            return true;
+        }
+
         if (m_bRunning) {
              // Moving background
             m_fBackgroundPositionY += BACKGROUND_SPEED * fElapsedTime;
-            if (m_fBackgroundPositionY >= 240.0f)
+            if (m_fBackgroundPositionY >= float(SCREEN_HEIGHT))
                 m_fBackgroundPositionY = 0;
 
             // Collision detection between player and entities
@@ -49,9 +58,29 @@ public:
                         if (dynamic_cast<AcidSpit*>(pEntity.get()) != nullptr) type = BoomType::Acid;
                         else if (dynamic_cast<AcidPuddle*>(pEntity.get()) != nullptr) type = BoomType::Acid;
                         else if (dynamic_cast<AcidBarrel*>(pEntity.get()) != nullptr) type = BoomType::Acid;
+                        else if (dynamic_cast<Barrel*>(pEntity.get()) != nullptr) type = BoomType::Acid;
                         else if (dynamic_cast<Rocket*>(pEntity.get()) != nullptr) type = BoomType::Basic;
                         MakeBoom(type);
                         m_bRunning = false;
+
+                        std::ifstream file("highscore.txt", std::ios::in);
+                        if (file.is_open()) {
+                            int nHighScore;
+                            file >> nHighScore;
+
+                            if (m_fScore > nHighScore) {
+                                file.close();
+                                std::ofstream outFile("highscore.txt", std::ios::out);
+                                if (outFile.is_open()) {
+                                    outFile << (int)m_fScore;
+                                    outFile.close();
+                                }
+                            }
+                            else {
+                                file.close();
+                            }
+                            file.close();
+                        }
                     }
                 }
             }
@@ -78,6 +107,10 @@ public:
 
             if (GetKey(olc::Key::SPACE).bPressed)
                 this->Restart();
+            else if (GetKey(olc::Key::ESCAPE).bPressed) {
+                m_pMenu->SetReadyToStart(false);
+                this->Restart();
+            }
         }
 
         m_pEntitiesManager->Update(fElapsedTime, m_nDifficultyLevel);
@@ -92,16 +125,16 @@ private:
     void Render() {
         Clear(olc::BLACK);
 
-        DrawDecal(olc::vf2d(0, (int)m_fBackgroundPositionY), m_pBackgroundDecal.get(), olc::vf2d(2, 2));
-        DrawDecal(olc::vf2d(0, (int)m_fBackgroundPositionY - SCREEN_HEIGHT), m_pBackgroundDecal.get(), olc::vf2d(2, 2));
+        DrawDecal(olc::vf2d(0, (int)m_fBackgroundPositionY), m_pBackgroundDecal.get(), olc::vf2d(SCALE, SCALE));
+        DrawDecal(olc::vf2d(0, (int)m_fBackgroundPositionY - SCREEN_HEIGHT), m_pBackgroundDecal.get(), olc::vf2d(SCALE, SCALE));
+        
+        m_pEntitiesManager->Render(*this);
 
         // Score text
         // Shadow
         DrawStringDecal({ SCREEN_WIDTH - 50 + 1, 20 + 1 }, std::to_string((int)m_fScore) + "m", olc::BLACK, { 1, 1 });
         // Actual text
         DrawStringDecal({ SCREEN_WIDTH - 50, 20 }, std::to_string((int)m_fScore) + "m", olc::WHITE, { 1, 1 });
-        
-        m_pEntitiesManager->Render(*this);
         
         if (!m_bRunning) {
             // Flash effect
@@ -123,6 +156,13 @@ private:
             DrawStringDecal(vTextPosition + olc::vf2d(1, 1), "Press SPACE to restart", olc::BLACK, { 1, 1 });
             // Actual text
             DrawStringDecal(vTextPosition, "Press SPACE to restart", olc::WHITE, { 1, 1 });
+
+            // "or ESC to exit to menu" text
+            vTextPosition = { float(SCREEN_WIDTH / 2 - 86), float(SCREEN_HEIGHT / 2 + 30) };
+            // Shadow
+            DrawStringDecal(vTextPosition + olc::vf2d(1, 1), "or ESC to exit to menu", olc::BLACK, { 1, 1 });
+            // Actual text
+            DrawStringDecal(vTextPosition, "or ESC to exit to menu", olc::WHITE, { 1, 1 });
         }
     }
 
@@ -153,10 +193,12 @@ private:
     std::unique_ptr<olc::Sprite> m_pFlashSprite;
     std::unique_ptr<olc::Decal> m_pFlashDecal;
 
+    std::unique_ptr<Menu> m_pMenu;
+
     float m_fBackgroundPositionY = 0;
 
     std::shared_ptr<Player> m_pPlayer;
-    EntitiesManager* m_pEntitiesManager;
+    std::unique_ptr<EntitiesManager> m_pEntitiesManager;
 
     int m_nDifficultyLevel = 1;
     float m_fScore = 0.0f; 

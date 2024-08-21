@@ -20,6 +20,8 @@
 
 #include "log.hpp"
 #include "randomize.hpp"
+#include "collision.hpp"
+
 #include <algorithm>
 #include <memory>
 
@@ -173,6 +175,14 @@ public:
 
             Obstacle* o = dynamic_cast<Obstacle*>(pEntity.get());
             if (o == nullptr) m_bLanes.set(pEntity->GetLane() - 1);
+            else {
+                for (auto& e : m_vLayers[2]) {
+                    Zombie* z = dynamic_cast<Zombie*>(e);
+                    if (z != nullptr && Collision::AABB(*z, *o)) {
+                        z->ToggleColided();
+                    } 
+                }
+            }
         }
     }
 
