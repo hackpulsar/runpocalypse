@@ -14,5 +14,8 @@ Left and right arrows.
 ![screenshot](/screenshots/4.jpg?raw=true "4")
 ![screenshot](/screenshots/5.jpg?raw=true "5")
 
+# Wanto to build by yourself?
+To build tehe project yourself first ```git clone``` it. Navigate into the directory you cloned into and run ```cmake . -B./build```. That will generate a ```build``` directory with a Makefile. Navigate there and run ```make```.
+
 # Credits
 This project was made possible by using [olcPixelGameEngine](https://github.com/OneLoneCoder/olcPixelGameEngine) made by [javidx9](https://github.com/OneLoneCoder).
