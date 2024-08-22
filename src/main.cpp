@@ -1,3 +1,4 @@
+#include "settings.hpp"
 #define OLC_PGE_APPLICATION
 
 #include "entities/player.hpp"
@@ -6,6 +7,8 @@
 #include "collision.hpp"
 
 #include <fstream>
+
+#include "log.hpp"
 
 class Application : public olc::PixelGameEngine
 {
@@ -60,8 +63,12 @@ public:
                         else if (dynamic_cast<AcidBarrel*>(pEntity.get()) != nullptr) type = BoomType::Acid;
                         else if (dynamic_cast<Barrel*>(pEntity.get()) != nullptr) type = BoomType::Acid;
                         else if (dynamic_cast<Rocket*>(pEntity.get()) != nullptr) type = BoomType::Basic;
-                        MakeBoom(type);
+
                         m_bRunning = false;
+                        MakeBoom(type);
+                        StopAllObstacles();
+
+                        LOG("Player collided with an entity");
 
                         std::ifstream file("highscore.txt", std::ios::in);
                         if (file.is_open()) {
@@ -81,13 +88,15 @@ public:
                             }
                             file.close();
                         }
+
+                        break;
                     }
                 }
             }
 
             m_fScore += fElapsedTime * PLAYER_SPEED;
 
-            if ((int)m_fScore % 50 == 0) {
+            if ((int)m_fScore % 50 == 0 && m_nDifficultyLevel < DIFFICULTY_CAP) {
                 LOG("Difficulty level increased, score: " + std::to_string((int)m_fScore));
                 m_nDifficultyLevel++;
                 m_fScore += 1.0f;
@@ -118,7 +127,7 @@ public:
                 this->Restart();
             }
         }
-
+        
         m_pEntitiesManager->Update(fElapsedTime, m_nDifficultyLevel);
         
         // Rendering
@@ -190,6 +199,15 @@ private:
         m_fFlashTransperency = 0.0f;
         m_bFlashPhaseOneEnded = false;
         m_bFlashPhaseTwoEnded = false;
+    }
+
+    void StopAllObstacles() {
+        for (const auto& pEntity : m_pEntitiesManager->GetEntities()) {
+            if (Obstacle* o = dynamic_cast<Obstacle*>(pEntity.get()); o != nullptr) {
+                LOG("stop all obstacles");
+                o->ToggleEndGame();
+            }
+        }
     }
 
 private:

@@ -15,7 +15,7 @@ struct AnimationData
 
     olc::vf2d vRenderSize;
     olc::vi2d vActualSize;
-
+ 
     bool bCycle;
 };
 

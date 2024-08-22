@@ -85,6 +85,9 @@ public:
         if (*m_pGameRunning) m_fObstaclesSpawnTimer += fElapsedTime;
         if (m_fObstaclesSpawnTimer >= m_fObstaclesSpawnInterval) {
             m_fObstaclesSpawnTimer = 0.0f;
+            
+            m_fEnemiesSpawnInterval = 10.f - float(nDifficultyLevel) / 2.f;
+
             int nLane = Randomize::GetRandom(1, 4);
             LOG("Lane for an obstacle: " + std::to_string(nLane));
             int nObstacleType = Randomize::GetRandom(0, 8);
@@ -157,7 +160,7 @@ public:
         for (auto& pEntity : m_vEntities) {
             Zombie* sz = dynamic_cast<Zombie*>(pEntity.get());
             if (sz != nullptr) {
-                if (*m_pGameRunning == false) sz->ToggleEndGameAnimation();
+                if (*m_pGameRunning == false) sz->ToggleEndGame();
 
                 if (sz->ReadyToShoot()) {
                     sz->Shoot();

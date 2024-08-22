@@ -44,8 +44,8 @@ public:
         m_bShot = true;
     }
 
-    void ToggleEndGameAnimation() override {
-        Zombie::ToggleEndGameAnimation();
+    void ToggleEndGame() override {
+        Zombie::ToggleEndGame();
         Animatable::PopAnimation();
         Animatable::AddAnimation("idle");
     }

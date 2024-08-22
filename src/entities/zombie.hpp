@@ -84,7 +84,6 @@ public:
         Entity::AdjustPosition(nLane);
     }
 
-    virtual void ToggleEndGameAnimation() { m_bEndGame = true; }
     void ToggleColided() { m_bColided = true; }
 
     bool ReadyToShoot() const { return m_bReadyToShoot; }
@@ -98,7 +97,6 @@ protected:
     float m_fShootTimer = 0.0f;
 
     bool m_bSpawned = false;
-    bool m_bEndGame = false;
     bool m_bLifeEnded = false;
 
     bool m_bColided = false;

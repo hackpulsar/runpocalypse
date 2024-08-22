@@ -25,4 +25,6 @@ constexpr float WARNING_LASTS = 3.0f;
 
 constexpr float PLAYER_SPEED = 4.5f;
 
+constexpr int DIFFICULTY_CAP = 7;
+
 #endif // SETTINGS_HPP

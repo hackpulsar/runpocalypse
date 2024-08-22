@@ -30,11 +30,15 @@ public:
     int GetLane() const { return m_nLane; }
     size_t GetID() const { return m_nID; }
 
+    virtual void ToggleEndGame() { m_bEndGame = true; }
+
 protected:
     size_t m_nID;
 
     olc::vf2d m_vPosition;
     int m_nLane;
+
+    bool m_bEndGame = false;
 
     bool m_bSelfDestruct = false;
 

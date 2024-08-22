@@ -18,7 +18,7 @@ public:
     { }
 
     virtual void Update(float fElapsedTime) override {
-        m_vPosition.y += BACKGROUND_SPEED * fElapsedTime;
+        if (!m_bEndGame) m_vPosition.y += BACKGROUND_SPEED * fElapsedTime;
         Collidable::UpdatePosition(m_vPosition);
     }
 

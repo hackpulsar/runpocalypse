@@ -5,7 +5,6 @@
 #include "settings.hpp"
 
 #include <fstream>
-#include "log.hpp"
 
 struct Button
 {
