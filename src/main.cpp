@@ -1,4 +1,3 @@
-#include "settings.hpp"
 #define OLC_PGE_APPLICATION
 
 #include "entities/player.hpp"

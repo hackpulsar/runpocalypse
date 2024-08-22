@@ -2,6 +2,7 @@
 #define MANU_HPP
 
 #include "olcPixelGameEngine.h"
+
 #include "settings.hpp"
 
 #include <fstream>

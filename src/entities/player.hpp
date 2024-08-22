@@ -33,7 +33,7 @@ public:
 
         Animatable::AddAnimation("run");
 
-        Renderable::SetLayer(1);
+        Renderable::SetLayer(1); 
     }
 
     void HandleInput(olc::PixelGameEngine& pge) override {

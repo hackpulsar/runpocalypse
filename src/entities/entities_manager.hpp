@@ -86,7 +86,7 @@ public:
         if (m_fObstaclesSpawnTimer >= m_fObstaclesSpawnInterval) {
             m_fObstaclesSpawnTimer = 0.0f;
             
-            m_fEnemiesSpawnInterval = 10.f - float(nDifficultyLevel) / 2.f;
+            m_fObstaclesSpawnInterval = 8.f - float(nDifficultyLevel) / 2.f;
 
             int nLane = Randomize::GetRandom(1, 4);
             LOG("Lane for an obstacle: " + std::to_string(nLane));
