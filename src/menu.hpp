@@ -110,8 +110,10 @@ public:
         pge->DrawStringDecal(exitButtonPos, m_ExitButton->sText, m_ExitButton->color, { 1, 1 });
 
         // Highscore text
+        #ifndef __EMSCRIPTEN__
         pge->DrawStringDecal({ SCREEN_WIDTH - (8 * 13) / 2 - 4 + 1, SCREEN_HEIGHT - 10 + 1 }, "Longest:" + std::to_string(m_nHighscore) + "m", olc::BLACK, { 0.5f, 0.5f });
         pge->DrawStringDecal({ SCREEN_WIDTH - (8 * 13) / 2 - 4, SCREEN_HEIGHT - 10 }, "Longest:" + std::to_string(m_nHighscore) + "m", olc::WHITE, { 0.5f, 0.5f });
+        #endif
     }
     
     void SetReadyToStart(bool bReady) { m_bReadyToStart = bReady; }
